@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.bumptech.glide.load.engine.Resource
 import kotlinx.coroutines.Dispatchers
@@ -29,4 +30,19 @@ class YelpViewModel(app:Application) : AndroidViewModel(app) {
             emit(raum.muchbeer.lazyinktx.utility.Resource.error(null, e.message ?: "Unknown Error"))
         }
     }
+
+    //This cover the Navigation component when the activity is clicked
+    private val _navigateRestaurant = MutableLiveData<YelpRestaurant>()
+    val navigateRestaurant
+        get() = _navigateRestaurant
+
+    fun onRestaurantClick(restaurant: YelpRestaurant) {
+        _navigateRestaurant.value = restaurant
+    }
+
+    fun onRestaurantClickedAlready(restaurant: YelpRestaurant) {
+        _navigateRestaurant.value = null
+    }
+
+
 }
