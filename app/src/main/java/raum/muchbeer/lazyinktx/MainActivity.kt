@@ -3,6 +3,7 @@ package raum.muchbeer.lazyinktx
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.Menu
 import android.view.View
@@ -16,7 +17,10 @@ import raum.muchbeer.lazyinktx.adapter.RestaurantAdapter
 import raum.muchbeer.lazyinktx.model.YelpRestaurant
 import raum.muchbeer.lazyinktx.utility.Status
 import raum.muchbeer.lazyinktx.viewmodel.YelpViewModel
+import timber.log.Timber
 
+
+const val STORE_KEY = "store_Bundle"
 class MainActivity : AppCompatActivity() {
 
     private lateinit var yelpViewModel: YelpViewModel
@@ -31,12 +35,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Timber.i( "OnCreate just created")
 
+        //savedInstanceState is called when a callback onStop(From Started to Created) is called
+        //This is the good time to save data to the  bundle
+        //onRestoreInstanceState is called when a callback onRestarted from (created to Started) is called
         yelpViewModel = ViewModelProvider(this).get(YelpViewModel::class.java)
         setUpLiveData()
 
         btnRetry.setOnClickListener {
             setUpLiveData()
+        }
+
+        if(savedInstanceState !=null) {
+            savedInstanceState.getInt(STORE_KEY)
+            //the below is saved and to be used when activity is restarted
+
         }
       //  yelpViewModel.retrieveResponse()
         val salaries = listOf(25, 89, 230)
@@ -50,6 +64,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        Timber.i("This is called when activity is put on background")
+        outState.putInt("storeValue", 1)
+        //Make sure the data saved is too small not more than 100KB
+        //When this bundle is saved will be available in onCreate savedInstance
+    }
 
     private fun setUpLiveData() {
         yelpViewModel.retrieveResponse().observe(this, {
